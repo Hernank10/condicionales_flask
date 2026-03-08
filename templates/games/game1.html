@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+
+{% block hero_title %}Juego 1: Construye la Oración{% endblock %}
+{% block hero_subtitle %}Crea oraciones condicionales similares a los ejemplos{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="game-container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h3 class="text-accent"><i class="bi bi-pencil-square me-2"></i> Construye la Oración</h3>
+            <a href="{{ url_for('index') }}" class="btn btn-menu">
+                <i class="bi bi-arrow-left me-1"></i> Volver al Menú
+            </a>
+        </div>
+        
+        <div id="example-card" class="example-card">
+            <div class="example-sentence" id="example-sentence">Cargando ejemplo...</div>
+            <div class="example-explanation" id="example-explanation"></div>
+        </div>
+        
+        <div class="mb-3">
+            <label for="user-input" class="form-label">Escribe tu oración aquí:</label>
+            <textarea class="form-control" id="user-input" rows="4" placeholder="Escribe una oración condicional similar al ejemplo..."></textarea>
+        </div>
+        
+        <div class="d-flex gap-2">
+            <button class="btn btn-check" onclick="checkSentence()">
+                <i class="bi bi-check-lg me-1"></i> Verificar
+            </button>
+            <button class="btn btn-next" onclick="nextExample(1)">
+                <i class="bi bi-arrow-right me-1"></i> Siguiente
+            </button>
+        </div>
+        
+        <div id="message" class="mt-3"></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    let currentExample = {};
+
+    // Cargar ejemplo aleatorio al iniciar
+    $(document).ready(function() {
+        loadRandomExample();
+    });
+
+    function loadRandomExample() {
+        $.ajax({
+            url: '/api/random_example',
+            method: 'GET',
+            success: function(data) {
+                currentExample = data;
+                $('#example-sentence').text(data.sentence);
+                $('#example-explanation').text(data.explanation);
+                $('#user-input').val('');
+                $('#message').empty();
+            }
+        });
+    }
+
+    function nextExample(gameId) {
+        loadRandomExample();
+    }
+
+    function checkSentence() {
+        const userInput = $('#user-input').val().trim();
+        
+        if (!userInput) {
+            showMessage('Por favor escribe una oración', false);
+            return;
+        }
+        
+        const hasSi = userInput.toLowerCase().includes('si ') || userInput.includes('Si ');
+        const hasComma = userInput.includes(',');
+        
+        if (hasSi && hasComma) {
+            showMessage('¡Correcto! Buena construcción condicional.', true);
+            updateScore(true, 1);
+        } else {
+            showMessage('Recuerda usar "si" y una coma para separar condición y consecuencia', false);
+            updateScore(false, 1);
+        }
+    }
+
+    function showMessage(text, isSuccess) {
+        const messageDiv = $('#message');
+        messageDiv.html(`<div class="alert ${isSuccess ? 'alert-success' : 'alert-danger'}">${text}</div>`);
+    }
+
+    function updateScore(correct, gameId) {
+        $.ajax({
+            url: '/api/update_score',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                correct: correct,
+                game_id: gameId
+            }),
+            success: function(data) {
+                $('#score-display').text(data.score);
+                $('#level-display').text(data.level);
+                $('#streak-display').text(data.streak);
+                
+                if (correct && data.points_earned > 0) {
+                    showMessage(`¡Correcto! Has ganado ${data.points_earned} puntos.`, true);
+                }
+            }
+        });
+    }
+</script>
+{% endblock %}

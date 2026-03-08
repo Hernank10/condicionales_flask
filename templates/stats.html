@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+
+{% block hero_title %}Estadísticas del Jugador{% endblock %}
+{% block hero_subtitle %}Sigue tu progreso en el aprendizaje de oraciones condicionales{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-3">
+            <div class="stats-card">
+                <div class="stats-value">{{ user.score }}</div>
+                <div class="stats-label">Puntuación Total</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stats-card">
+                <div class="stats-value">{{ user.level }}</div>
+                <div class="stats-label">Nivel Actual</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stats-card">
+                <div class="stats-value">{{ user.streak }}</div>
+                <div class="stats-label">Racha Actual</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stats-card">
+                <div class="stats-value">{{ user.games_played }}</div>
+                <div class="stats-label">Juegos Completados</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <div class="stats-card">
+                <h4>Precisión</h4>
+                <div class="stats-value">
+                    {% if user.total_answers > 0 %}
+                        {{ (user.correct_answers / user.total_answers * 100)|int }}%
+                    {% else %}
+                        0%
+                    {% endif %}
+                </div>
+                <div class="progress mt-3" style="height: 20px;">
+                    {% set progress = (user.correct_answers / user.total_answers * 100)|int if user.total_answers > 0 else 0 %}
+                    <div class="progress-bar bg-success" role="progressbar" style="width: {{ progress }}%;" 
+                         aria-valuenow="{{ progress }}" aria-valuemin="0" aria-valuemax="100">{{ progress }}%</div>
+                </div>
+                <p class="mt-2 text-muted">{{ user.correct_answers }} respuestas correctas de {{ user.total_answers }} totales</p>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="stats-card">
+                <h4>Ejemplos por Categoría</h4>
+                <div class="d-flex flex-column gap-2 mt-3">
+                    <div class="d-flex justify-content-between">
+                        <span class="category-badge category-reales">Reales</span>
+                        <span>{{ category_count.Reales }} ejemplos</span>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span class="category-badge category-potenciales">Potenciales</span>
+                        <span>{{ category_count.Potenciales }} ejemplos</span>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span class="category-badge category-irreales">Irreales</span>
+                        <span>{{ category_count.Irreales }} ejemplos</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="stats-card">
+                <h4>Historial Reciente</h4>
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Juego</th>
+                                <th>Resultado</th>
+                                <th>Puntos</th>
+                                <th>Fecha</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for game in games_history %}
+                            <tr>
+                                <td>Juego {{ game.game_id }}</td>
+                                <td>
+                                    {% if game.correct %}
+                                    <span class="badge bg-success">Correcto</span>
+                                    {% else %}
+                                    <span class="badge bg-danger">Incorrecto</span>
+                                    {% endif %}
+                                </td>
+                                <td>+{{ game.score_earned }}</td>
+                                <td>{{ game.timestamp.strftime('%d/%m/%Y %H:%M') }}</td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="4" class="text-center">No hay historial disponible</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+
+{% block hero_title %}Juego 2: Clasifica el Tipo{% endblock %}
+{% block hero_subtitle %}Identifica si la oración es Real, Potencial o Irreal{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="game-container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h3 class="text-success"><i class="bi bi-tags me-2"></i> Clasifica el Tipo</h3>
+            <a href="{{ url_for('index') }}" class="btn btn-menu">
+                <i class="bi bi-arrow-left me-1"></i> Volver al Menú
+            </a>
+        </div>
+        
+        <div class="example-card text-center">
+            <div class="example-sentence" id="example-sentence">Cargando ejemplo...</div>
+        </div>
+        
+        <div class="text-center mb-4">
+            <p>¿Qué tipo de oración condicional es esta?</p>
+        </div>
+        
+        <div class="d-flex flex-column gap-2 mb-4">
+            <button class="btn btn-outline-primary p-3 text-start" onclick="checkCategory('Reales')">
+                <i class="bi bi-circle me-2"></i> Real (Condición posible)
+            </button>
+            <button class="btn btn-outline-success p-3 text-start" onclick="checkCategory('Potenciales')">
+                <i class="bi bi-circle me-2"></i> Potencial (Condición improbable)
+            </button>
+            <button class="btn btn-outline-danger p-3 text-start" onclick="checkCategory('Irreales')">
+                <i class="bi bi-circle me-2"></i> Irreal (Condición imposible)
+            </button>
+        </div>
+        
+        <div class="d-flex gap-2">
+            <button class="btn btn-next" onclick="nextExample(2)">
+                <i class="bi bi-arrow-right me-1"></i> Siguiente
+            </button>
+        </div>
+        
+        <div id="message" class="mt-3"></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    let currentExample = {};
+
+    // Cargar ejemplo aleatorio al iniciar
+    $(document).ready(function() {
+        loadRandomExample();
+    });
+
+    function loadRandomExample() {
+        $.ajax({
+            url: '/api/random_example',
+            method: 'GET',
+            success: function(data) {
+                currentExample = data;
+                $('#example-sentence').text(data.sentence);
+                $('#message').empty();
+            }
+        });
+    }
+
+    function nextExample(gameId) {
+        loadRandomExample();
+    }
+
+    function checkCategory(selectedCategory) {
+        if (selectedCategory === currentExample.category) {
+            showMessage(`¡Correcto! ${currentExample.explanation}`, true);
+            updateScore(true, 2);
+        } else {
+            showMessage(`Incorrecto. Es una oración ${currentExample.category}`, false);
+            updateScore(false, 2);
+        }
+    }
+
+    function showMessage(text, isSuccess) {
+        const messageDiv = $('#message');
+        messageDiv.html(`<div class="alert ${isSuccess ? 'alert-success' : 'alert-danger'}">${text}</div>`);
+    }
+
+    function updateScore(correct, gameId) {
+        $.ajax({
+            url: '/api/update_score',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                correct: correct,
+                game_id: gameId
+            }),
+            success: function(data) {
+                $('#score-display').text(data.score);
+                $('#level-display').text(data.level);
+                $('#streak-display').text(data.streak);
+            }
+        });
+    }
+</script>
+{% endblock %}

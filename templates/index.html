@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+
+{% block hero_title %}Constructor de Oraciones Condicionales{% endblock %}
+{% block hero_subtitle %}Domina el uso de las oraciones condicionales según las normas de la RAE{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2 class="text-center mb-4">Juegos Educativos</h2>
+    <p class="text-center mb-5">Practica las oraciones condicionales con estos 5 juegos interactivos</p>
+    
+    <div class="row">
+        <!-- Game 1 Card -->
+        <div class="col-md-4">
+            <div class="game-card" onclick="window.location.href='{{ url_for('game', game_id=1) if current_user.is_authenticated else '#' }}'">
+                <div class="game-card-header game-1">
+                    <i class="bi bi-pencil-square me-2"></i> Juego 1: Construye la Oración
+                </div>
+                <div class="card-body bg-white p-4">
+                    <p class="card-text">Crea oraciones condicionales similares a los ejemplos proporcionados.</p>
+                    <div class="mt-3">
+                        <span class="badge bg-primary">Nivel 1-3</span>
+                        <span class="badge bg-secondary ms-2">10-30 pts</span>
+                    </div>
+                    {% if not current_user.is_authenticated %}
+                    <div class="alert alert-warning mt-3 mb-0 p-2">
+                        <small><i class="bi bi-exclamation-triangle"></i> Inicia sesión para jugar</small>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Game 2 Card -->
+        <div class="col-md-4">
+            <div class="game-card" onclick="window.location.href='{{ url_for('game', game_id=2) if current_user.is_authenticated else '#' }}'">
+                <div class="game-card-header game-2">
+                    <i class="bi bi-tags me-2"></i> Juego 2: Clasifica el Tipo
+                </div>
+                <div class="card-body bg-white p-4">
+                    <p class="card-text">Identifica si una oración es Real, Potencial o Irreal.</p>
+                    <div class="mt-3">
+                        <span class="badge bg-primary">Nivel 1-3</span>
+                        <span class="badge bg-secondary ms-2">10-30 pts</span>
+                    </div>
+                    {% if not current_user.is_authenticated %}
+                    <div class="alert alert-warning mt-3 mb-0 p-2">
+                        <small><i class="bi bi-exclamation-triangle"></i> Inicia sesión para jugar</small>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Game 3 Card -->
+        <div class="col-md-4">
+            <div class="game-card" onclick="window.location.href='{{ url_for('game', game_id=3) if current_user.is_authenticated else '#' }}'">
+                <div class="game-card-header game-3">
+                    <i class="bi bi-input-cursor-text me-2"></i> Juego 3: Completa los Huecos
+                </div>
+                <div class="card-body bg-white p-4">
+                    <p class="card-text">Rellena los espacios en blanco en oraciones condicionales.</p>
+                    <div class="mt-3">
+                        <span class="badge bg-primary">Nivel 2-4</span>
+                        <span class="badge bg-secondary ms-2">15-35 pts</span>
+                    </div>
+                    {% if not current_user.is_authenticated %}
+                    <div class="alert alert-warning mt-3 mb-0 p-2">
+                        <small><i class="bi bi-exclamation-triangle"></i> Inicia sesión para jugar</small>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row mt-4">
+        <!-- Game 4 Card -->
+        <div class="col-md-6">
+            <div class="game-card" onclick="window.location.href='{{ url_for('game', game_id=4) if current_user.is_authenticated else '#' }}'">
+                <div class="game-card-header game-4">
+                    <i class="bi bi-sort-alpha-down me-2"></i> Juego 4: Ordena las Palabras
+                </div>
+                <div class="card-body bg-white p-4">
+                    <p class="card-text">Organiza palabras desordenadas para formar oraciones correctas.</p>
+                    <div class="mt-3">
+                        <span class="badge bg-primary">Nivel 2-4</span>
+                        <span class="badge bg-secondary ms-2">12-32 pts</span>
+                    </div>
+                    {% if not current_user.is_authenticated %}
+                    <div class="alert alert-warning mt-3 mb-0 p-2">
+                        <small><i class="bi bi-exclamation-triangle"></i> Inicia sesión para jugar</small>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Game 5 Card -->
+        <div class="col-md-6">
+            <div class="game-card" onclick="window.location.href='{{ url_for('game', game_id=5) if current_user.is_authenticated else '#' }}'">
+                <div class="game-card-header game-5">
+                    <i class="bi bi-card-checklist me-2"></i> Juego 5: Memoria Condicional
+                </div>
+                <div class="card-body bg-white p-4">
+                    <p class="card-text">Encuentra pares de condición y consecuencia.</p>
+                    <div class="mt-3">
+                        <span class="badge bg-primary">Nivel 3-5</span>
+                        <span class="badge bg-secondary ms-2">20-40 pts</span>
+                    </div>
+                    {% if not current_user.is_authenticated %}
+                    <div class="alert alert-warning mt-3 mb-0 p-2">
+                        <small><i class="bi bi-exclamation-triangle"></i> Inicia sesión para jugar</small>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Información sobre oraciones condicionales -->
+    <div class="row mt-5">
+        <div class="col-12">
+            <div class="game-container">
+                <h3 class="mb-4"><i class="bi bi-info-circle me-2"></i>¿Qué son las oraciones condicionales?</h3>
+                <p>Las oraciones condicionales expresan una condición que debe cumplirse para que ocurra lo expresado en la oración principal. Se clasifican en tres tipos según la RAE:</p>
+                
+                <div class="row mt-4">
+                    <div class="col-md-4">
+                        <div class="category-badge category-reales mb-3 text-center w-100">Reales</div>
+                        <p>Expresan condiciones que se perciben como factibles, posibles de cumplirse en el presente o en el futuro.</p>
+                        <p><strong>Ejemplo:</strong> "Si llueve, nos quedamos en casa."</p>
+                        <p><small class="text-muted">Estructura: Si + Presente Indicativo + Presente/Futuro</small></p>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="category-badge category-potenciales mb-3 text-center w-100">Potenciales</div>
+                        <p>Expresan condiciones que el hablante considera poco probables o hipotéticas, especialmente referidas al futuro.</p>
+                        <p><strong>Ejemplo:</strong> "Si tuviera dinero, compraría una casa."</p>
+                        <p><small class="text-muted">Estructura: Si + Imperfecto Subjuntivo + Condicional</small></p>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="category-badge category-irreales mb-3 text-center w-100">Irreales</div>
+                        <p>Expresan condiciones que no se cumplieron en el pasado y, por tanto, las consecuencias son imposibles.</p>
+                        <p><strong>Ejemplo:</strong> "Si hubieras estudiado, habrías aprobado."</p>
+                        <p><small class="text-muted">Estructura: Si + Pluscuamperfecto Subjuntivo + Condicional Compuesto</small></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

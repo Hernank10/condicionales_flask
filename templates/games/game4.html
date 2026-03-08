@@ -1,0 +1,159 @@
+{% extends "base.html" %}
+
+{% block hero_title %}Juego 4: Ordena las Palabras{% endblock %}
+{% block hero_subtitle %}Organiza palabras desordenadas para formar oraciones correctas{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="game-container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h3 style="color: #9b59b6;"><i class="bi bi-sort-alpha-down me-2"></i> Ordena las Palabras</h3>
+            <a href="{{ url_for('index') }}" class="btn btn-menu">
+                <i class="bi bi-arrow-left me-1"></i> Volver al Menú
+            </a>
+        </div>
+        
+        <div class="mb-4">
+            <p>Palabras disponibles:</p>
+            <div id="available-words" class="word-container">
+                <!-- Available words will be inserted here -->
+            </div>
+            
+            <p>Tu oración:</p>
+            <div id="selected-words" class="word-container">
+                <!-- Selected words will be inserted here -->
+            </div>
+        </div>
+        
+        <div class="d-flex gap-2">
+            <button class="btn btn-check" onclick="checkOrder()">
+                <i class="bi bi-check-lg me-1"></i> Verificar
+            </button>
+            <button class="btn btn-next" onclick="nextExample(4)">
+                <i class="bi bi-arrow-right me-1"></i> Siguiente
+            </button>
+        </div>
+        
+        <div id="message" class="mt-3"></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    let currentExample = {};
+    let shuffledWords = [];
+    let selectedWords = [];
+
+    // Cargar ejemplo aleatorio al iniciar
+    $(document).ready(function() {
+        loadRandomExample();
+    });
+
+    function loadRandomExample() {
+        $.ajax({
+            url: '/api/random_example',
+            method: 'GET',
+            success: function(data) {
+                currentExample = data;
+                setupWordOrderGame(data.sentence);
+                $('#message').empty();
+            }
+        });
+    }
+
+    function setupWordOrderGame(sentence) {
+        // Dividir y mezclar palabras
+        shuffledWords = sentence.split(' ');
+        
+        // Fisher-Yates shuffle
+        for (let i = shuffledWords.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [shuffledWords[i], shuffledWords[j]] = [shuffledWords[j], shuffledWords[i]];
+        }
+        
+        selectedWords = [];
+        updateDisplay();
+    }
+
+    function updateDisplay() {
+        // Mostrar palabras disponibles
+        let availableHTML = '';
+        shuffledWords.forEach(word => {
+            availableHTML += `<span class="word-draggable" onclick="selectWord('${word}')">${word}</span>`;
+        });
+        $('#available-words').html(availableHTML);
+        
+        // Mostrar palabras seleccionadas
+        let selectedHTML = '';
+        selectedWords.forEach(word => {
+            selectedHTML += `<span class="word-draggable" onclick="deselectWord('${word}')">${word}</span>`;
+        });
+        $('#selected-words').html(selectedHTML);
+    }
+
+    function selectWord(word) {
+        // Agregar palabra a la lista seleccionada
+        selectedWords.push(word);
+        
+        // Eliminar palabra de disponibles
+        const index = shuffledWords.indexOf(word);
+        if (index > -1) {
+            shuffledWords.splice(index, 1);
+        }
+        
+        updateDisplay();
+    }
+
+    function deselectWord(word) {
+        // Eliminar palabra de seleccionadas
+        const index = selectedWords.indexOf(word);
+        if (index > -1) {
+            selectedWords.splice(index, 1);
+        }
+        
+        // Agregar palabra a disponibles
+        shuffledWords.push(word);
+        
+        updateDisplay();
+    }
+
+    function nextExample(gameId) {
+        loadRandomExample();
+    }
+
+    function checkOrder() {
+        const userSentence = selectedWords.join(' ');
+        
+        if (userSentence === currentExample.sentence) {
+            showMessage('¡Correcto! Orden perfecto.', true);
+            updateScore(true, 4);
+        } else {
+            showMessage(`Incorrecto. La oración correcta es: ${currentExample.sentence}`, false);
+            updateScore(false, 4);
+        }
+    }
+
+    function showMessage(text, isSuccess) {
+        const messageDiv = $('#message');
+        messageDiv.html(`<div class="alert ${isSuccess ? 'alert-success' : 'alert-danger'}">${text}</div>`);
+    }
+
+    function updateScore(correct, gameId) {
+        $.ajax({
+            url: '/api/update_score',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                correct: correct,
+                game_id: gameId
+            }),
+            success: function(data) {
+                $('#score-display').text(data.score);
+                $('#level-display').text(data.level);
+                $('#streak-display').text(data.streak);
+            }
+        });
+    }
+</script>
+{% endblock %}
